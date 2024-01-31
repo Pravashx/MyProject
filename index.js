@@ -1,10 +1,10 @@
+const app = require('./src/config/express.config')
 const http = require('http')
-const server = http.createServer((req, res)=>{
-    res.end("Hello There")
-});
 
-server.listen('3005', 'localhost', (err) => {
-    if (!err) {
-        console.log("Server is running ^_^")
+const server = http.createServer(app)
+
+server.listen('3005', 'localhost', (error)=>{
+    if(!error){
+        console.log("Server is Running Sir ^.^")
     }
 })
