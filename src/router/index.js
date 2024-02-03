@@ -3,4 +3,4 @@ const authRouter = require('../app/auth/auth.router')
 
 router.use(authRouter)
 
-module.exports = router
+module.exports = router;
