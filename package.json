@@ -1,7 +1,7 @@
 {
   "name": "myproject",
   "version": "1.0.0",
-  "description": "",
+  "description": "* FrontEnd     -Landing         -Banner         -Product Info         -[Install our app from PlayStore, AppStore]         -Footer",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
@@ -11,11 +11,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.3"
   },
   "dependencies": {
+    "dotenv": "^16.4.1",
     "express": "^4.18.2",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.9",
     "zod": "^3.22.4"
   }
 }
