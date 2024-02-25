@@ -22,10 +22,9 @@ const ImageFilter = (req, file, cb) => {
     if (allowed.includes(ext.toLowerCase())) {
         cb(null, true)
     } else {
-        next({ code: 400, message: "Image Format not Supported" })
+        cb({ code: 400, message: "Image Format not Supported" })
     }
 }
-
 const uploader = multer({
     storage: MyStorage,
     fileFilter: ImageFilter,

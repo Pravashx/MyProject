@@ -30,7 +30,7 @@ app.use((error, req, res, next) => {
     console.log("GarbageCollector: ", error)
     let code = error.code ?? 500
     let message = error.message ?? "Internal Server Error"
-
+    let result = error.result ?? null
     if (error instanceof MulterError) {
         if (error.code === "LIMIT_FILE_SIZE") {
             code= 400,
