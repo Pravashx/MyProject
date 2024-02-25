@@ -1,26 +1,16 @@
-const dotenv = require('dotenv').config()
-const { GenerateRandomString } = require('../../config/helper')
+require('dotenv').config()
 const authSvc = require('./auth.service')
 const bcrypt = require('bcryptjs')
 const mailSvc = require('../../services/mail.service')
 const jwt = require('jsonwebtoken')
-const { MongoClient } = require("mongodb")
-const { dbSvc } = require("../../services/db.service")
+const { AuthRequest } = require('./auth.request')
 
 class AuthController {
+
     register = async (req, res, next) => {
         try {
-            let payload = req.body
-            if (req.file) {
-                payload.image = req.file.filename
-            } else if (req.files) {
-                payload.image = req.files.map((item) => item.filename)
-            }
-            payload.status = "inactive";
-            payload.token = GenerateRandomString()
-
-            // DB
-            // let response = await dbSvc.db.collection('users').insertOne(payload)
+            let payload = (new AuthRequest(req)).transformRequestData()
+            // DBs
             let response = await authSvc.registerUser(payload)
 
             let mailMsg = authSvc.registerEmailMessage(payload.name, payload.token)
@@ -98,39 +88,47 @@ class AuthController {
     async login(req, res, next) {
         try {
             let credentials = req.body;
-            let userDetail = {
-                _id: "1234",
-                name: "Pravash Thakuri",
-                email: "pravashotaku@gmail.com",
-                phoneNum: "9849601141",
-                role: "admin",
-                status: "active",
-                token: null,
-                password: "$2a$10$qUtN997dSmX4U5iSadyP3urYKIU75JXZH5u.8U.M83QzRIx4MrkTy"
-            }
 
-            if (bcrypt.compareSync(credentials.password, userDetail.password)) {
-                let token = jwt.sign({
-                    userId: userDetail._id
-                }, process.env.JWT_SECRET, {
-                    expiresIn: "1h"
-                })
+            let userDetail = await authSvc.getuserByFilter({
+                email: credentials.email
+            })
 
-                let refreshToken = jwt.sign({
-                    userId: userDetail._id
-                }, process.env.JWT_SECRET, {
-                    expiresIn: "1d"
-                })
+            if (userDetail) {
+                if (userDetail.token === null && userDetail.status === 'active') {
+                    if (bcrypt.compareSync(credentials.password, userDetail.password)) {
+                        let token = jwt.sign({
+                            userId: userDetail._id
+                        }, process.env.JWT_SECRET, {
+                            expiresIn: "1h"
+                        })
 
-                res.json({
-                    token: token,
-                    refreshToken: refreshToken,
-                    type: "Bearer"
-                })
+                        let refreshToken = jwt.sign({
+                            userId: userDetail._id
+                        }, process.env.JWT_SECRET, {
+                            expiresIn: "1d"
+                        })
+
+                        let patData = {
+                            userId: userDetail._id,
+                            token: token,
+                            refreshToken: refreshToken
+                        }
+                        await authSvc.storePAT(patData)
+
+                        res.json({
+                            token: token,
+                            refreshToken: refreshToken,
+                            type: "Bearer"
+                        })
+                    } else {
+                        next({ code: 400, message: "Credential does not match sir" })
+                    }
+                } else {
+                    next({ code: 401, messsage: "User not activated. Check your email for activation link." })
+                }
             } else {
-                next({ code: 400, message: "Credential does not match sir" })
+                next({ code: 400, message: "User does not exists." })
             }
-
         } catch (exception) {
             next(exception)
         }
@@ -141,7 +139,20 @@ class AuthController {
             result: req.authUser
         })
     }
+    
+    logout = async (req, res, next)=>{
+        try{
+            let user = req.authUser
+            let loggedout = await authSvc.deletePatData(user._id)
+        }catch(exception){
+            next(exception)
+        }
+    }
 }
 
 const authCtrl = new AuthController()
 module.exports = authCtrl
+
+
+
+

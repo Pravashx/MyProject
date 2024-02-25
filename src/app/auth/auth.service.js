@@ -1,7 +1,8 @@
 require('dotenv').config()
-const { DataBaseService } = require('../../services/db.service');
+const UserModel = require('../user/user.model');
+const PATModel = require('./personal-access-token-model');
 
-class AuthService extends DataBaseService{
+class AuthService {
     registerEmailMessage=(name, token)=>{
         return  `
         <b> Dear ${name}</b><br/>
@@ -20,7 +21,10 @@ class AuthService extends DataBaseService{
 
     registerUser = async(payload)=>{
         try{
-            let response = await this.db.collection("users").insertOne(payload)
+            let user = new UserModel(payload)
+            let response = await user.save();
+            // let response = await this.db.collection("users").insertOne(payload)
+            return response;
         }catch(exception){
             throw exception
         }
@@ -28,7 +32,7 @@ class AuthService extends DataBaseService{
  
     getuserByFilter = async(filter) =>{
         try{
-            let userDetail = await this.db.collection('users').findOne(filter)
+            let userDetail = await UserModel.findOne(filter)
             return userDetail;
         }catch(exception){
             throw exception
@@ -36,7 +40,7 @@ class AuthService extends DataBaseService{
     }
     updateUser = async(filter, data)=>{
         try{
-            let response = await this.db.collection('users').updateOne(filter,{
+            let response = await UserModel.updateOne(filter,{
                 $set: data
             })
             return response;
@@ -45,6 +49,24 @@ class AuthService extends DataBaseService{
         }
     }
 
+    storePAT = async(data)=>{
+        try{
+            let patObj = new PATModel(data)
+            return await patObj.save()
+        }catch(exception){
+            throw exception
+        }
+    }
+    getPatByToken = async(token)=>{
+        try{
+            let patData = await PATModel.findOne({
+                token: token
+            })
+            return patData
+        }catch(exception){
+            throw exception
+        }
+    }
 }
 
 const authSvc = new AuthService;

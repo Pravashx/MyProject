@@ -1,20 +1,12 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
+const authSvc = require('../app/auth/auth.service')
+const { getTokenFromHeader } = require('../config/helper')
 
-const CheckLogin = (req, res, next) => {
+const CheckLogin = async (req, res, next) => {
     try {
-        let token = null
-
-        if (req.headers['authorization']) {
-            token = req.headers['authorization']
-        }
-        if (req.headers['x-xsrf-token']) {
-            token = req.headers['x-xsrf-token']
-        }
-        if (req.query['token']) {
-            token = req.query['token']
-        }
-        //
+        
+        let token = getTokenFromHeader(req);
 
         if (token === null) {
             next({ code: 401, message: "Login required" })
@@ -23,22 +15,22 @@ const CheckLogin = (req, res, next) => {
             if (!token) {
                 next({ code: 401, message: "Token required" })
             } else {
-                let data = jwt.verify(token, process.env.JWT_SECRET)
-                console.log(data)
-                let userDetail = {
-                    _id: "1234",
-                    name: "Pravash Thakuri",
-                    email: "pravashotaku@gmail.com",
-                    phoneNum: "9849601141",
-                    role: "admin",
-                    status: "active",
-                    token: null
-                }
-                if(userDetail){
-                    req.authUser = userDetail
-                    next()
-                }else{
-                    next({code: 403, message: "User does not exists"})
+                let patData = await authSvc.getPatByToken(token)
+                if (patData) {
+                    let data = jwt.verify(token, process.env.JWT_SECRET)
+
+                    let userDetail = await authSvc.getuserByFilter({
+                        _id: data.userId
+                    })
+
+                    if (userDetail) {
+                        req.authUser = userDetail
+                        next()
+                    } else {
+                        next({ code: 401, message: "User does not exists" })
+                    }
+                } else {
+                    nexxt({ code: 401, message: "Token already expired or invalid" })
                 }
             }
         }
@@ -50,3 +42,7 @@ const CheckLogin = (req, res, next) => {
 }
 
 module.exports = CheckLogin
+
+
+
+

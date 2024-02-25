@@ -1,8 +1,10 @@
 const express = require('express')
+const app = express()
+require('./db.config')
+
 const router = require('../router/index')
 const { MulterError } = require('multer')
 const { ZodError } = require('zod')
-const app = express()
 
 // Body Parser
 app.use(express.json())
@@ -33,20 +35,32 @@ app.use((error, req, res, next) => {
     let result = error.result ?? null
     if (error instanceof MulterError) {
         if (error.code === "LIMIT_FILE_SIZE") {
-            code= 400,
-            message= error.message
+            code = 400,
+                message = error.message
         }
     }
 
-    if(error instanceof ZodError){
+    if (error instanceof ZodError) {
         code = 400;
         let ZodErrors = error.errors;
-        let msg= {}
-        ZodErrors.map((err)=>{
-            msg[err.path[0]]= err.message
+        let msg = {}
+        ZodErrors.map((err) => {
+            msg[err.path[0]] = err.message
         })
-        message= "Validation Failure";
-        result= msg
+        message = "Validation Failure";
+        result = msg
+    }
+
+    if (error.code === 11000) {
+        code = 400
+        let uniqueKeys = Object.keys(error.keyPattern)
+        let msgBody = uniqueKeys.map((key) => {
+            return {
+                [key]: key + " should be Unique"
+            }
+        })
+        result = msgBody;
+        message= "Validation Fail"
     }
 
     res.status(code).json({

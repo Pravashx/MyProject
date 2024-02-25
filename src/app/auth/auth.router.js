@@ -28,7 +28,7 @@ router.get('/admin-seller', CheckLogin, CheckPermission(['admin', 'seller']), (r
 router.post('/refresh-token')
 
 router.get('/forget-password', (req, res, next) => { })
-router.post('/logout', (req, res, next) => { })
+router.post('/logout', CheckLogin, authCtrl.logout)
 
 
 module.exports = router
