@@ -43,9 +43,7 @@ const userSchemaDef = new mongoose.Schema({
     },
     token: String,
     resetToken: String,
-    resetExpiry: {
-        type: Date,
-    }
+    resetExpiry: Date
 }, {
     // CreatedAt UpdatedAt
     timestamps: true,

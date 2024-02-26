@@ -2,7 +2,7 @@ const router = require('express').Router()
 const authCtrl = require('../auth/auth.controller')
 const uploader = require('../../middlewares/uploader.middleware')
 const ValidateRequest = require('../../middlewares/validate-request-middleware')
-const { registerSchema, passwordSchema, loginSchema } = require('./auth.validator')
+const { registerSchema, passwordSchema, loginSchema, emailValidation } = require('./auth.validator')
 const CheckLogin = require('../../middlewares/auth.middleware')
 const CheckPermission = require('../../middlewares/rbac.middleware')
 
@@ -27,7 +27,8 @@ router.get('/admin-seller', CheckLogin, CheckPermission(['admin', 'seller']), (r
 
 router.post('/refresh-token')
 
-router.get('/forget-password', (req, res, next) => { })
+router.post('/forget-password', ValidateRequest(emailValidation), authCtrl.forgetPassword)
+router.post('/reset-password/:resetToken', ValidateRequest(passwordSchema), authCtrl.resetPassword)
 router.post('/logout', CheckLogin, authCtrl.logout)
 
 

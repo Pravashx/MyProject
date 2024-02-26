@@ -1,10 +1,13 @@
+require('./db.config')
 const express = require('express')
 const app = express()
-require('./db.config')
+const cors = require('cors')
 
 const router = require('../router/index')
 const { MulterError } = require('multer')
 const { ZodError } = require('zod')
+
+app.use(cors());
 
 // Body Parser
 app.use(express.json())
@@ -60,7 +63,7 @@ app.use((error, req, res, next) => {
             }
         })
         result = msgBody;
-        message= "Validation Fail"
+        message = "Validation Fail"
     }
 
     res.status(code).json({
