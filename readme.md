@@ -10,10 +10,38 @@
 
 * BackEnd
     - Auth and Authorization {Done}
-    - Banner API
+
+    - Banner API:
+                Image
+                Url
+                Title
+                Status[Active, Inactive]
+
     - Product API
     - Delivery API
     - Cart API
     - Map
      
-     
+    - Product
+    - Qty
+    - Price
+    - Discount
+    - userDetail
+    - Adress
+    - Payment Detail
+
+    Cart
+        Product,
+        Qty
+    
+    Buyer
+
+    Product:
+        Name
+        Image
+        Price
+        Discount
+        Description
+        Calories
+        Attributes (large,medium, small)
+        (Review)

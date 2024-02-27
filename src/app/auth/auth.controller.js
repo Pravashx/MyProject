@@ -117,9 +117,11 @@ class AuthController {
                         await authSvc.storePAT(patData)
 
                         res.json({
-                            token: token,
-                            refreshToken: refreshToken,
-                            type: "Bearer"
+                            result: {
+                                token: token,
+                                refreshToken: refreshToken,
+                                type: "Bearer "
+                            }
                         })
                     } else {
                         next({ code: 400, message: "Credential does not match sir" })
