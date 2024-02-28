@@ -4,7 +4,7 @@ const registerSchema = z.object({
     name: z.string().min(2).max(50),
     email: z.string().email(),
     phone: z.string().min(10).max(10),
-    role: z.string().regex(/admin|customer|seller/).default('customer'),
+    role: z.string().regex(/admin|customer/).default('customer'),
     status: z.string().regex(/active|inactive/).default('inactive')
 })
 

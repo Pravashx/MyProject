@@ -12,10 +12,12 @@
     - Auth and Authorization {Done}
 
     - Banner API:
-                Image
-                Url
-                Title
-                Status[Active, Inactive]
+                -Image
+                -Url
+                -Title
+                -Status[Active, Inactive]
+                -StartTime and EndTime
+                -Priority
 
     - Product API
     - Delivery API
@@ -30,18 +32,18 @@
     - Adress
     - Payment Detail
 
-    Cart
-        Product,
-        Qty
+    ### Cart
+        - Product,
+        - Qty
     
-    Buyer
+    ### Buyer
 
-    Product:
-        Name
-        Image
-        Price
-        Discount
-        Description
-        Calories
-        Attributes (large,medium, small)
-        (Review)
+    ### Product:
+        -Name
+        -Image
+        -Price
+        -Discount
+        -Description
+        -Calories
+        -Attributes (large,medium, small)
+        -(Review)

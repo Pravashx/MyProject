@@ -114,6 +114,7 @@ class AuthController {
                             token: token,
                             refreshToken: refreshToken
                         }
+
                         await authSvc.storePAT(patData)
 
                         res.json({

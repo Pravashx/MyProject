@@ -23,11 +23,7 @@ app.use('/v1', router)
 
 // 404 Error Handling
 app.use((req, res, next) => {
-    res.status(404).json({
-        result: "null",
-        message: "Not Found",
-        meta: "null"
-    })
+    next({code: 404, message: "Not Found"})
 })
 
 // Handle Different Type Of Error

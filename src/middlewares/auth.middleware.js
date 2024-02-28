@@ -36,7 +36,6 @@ const CheckLogin = async (req, res, next) => {
         }
 
     } catch (exception) {
-        console.log(exception)
         next({ code: 403, message: "Authentication Failed" })
     }
 }

@@ -21,9 +21,6 @@ router.get('/me', CheckLogin, authCtrl.getLoggedInUser)
 router.get('/admin', CheckLogin, CheckPermission('admin'), (req, res, next)=>{
     res.json("I'm Admin Lil Bro")
 })
-router.get('/admin-seller', CheckLogin, CheckPermission(['admin', 'seller']), (req, res, next)=>{
-    res.json("I'm Called by Admin and Seller")
-})
 
 router.post('/refresh-token')
 

@@ -1,3 +1,4 @@
+const fs = require('fs')
 const GenerateRandomString = (len = 100) => {
     const chars = "1234567890abcdefghijklmnopqrstuvwxzABCDEFGHIJKLMNOPQRSTUVWXZ"
     let length = chars.length
@@ -24,4 +25,9 @@ const getTokenFromHeader = (req) => {
     return token
 }
 
-module.exports = { GenerateRandomString, getTokenFromHeader}
+deleteFile = (path, filename) => {
+    if (filename && fs.existsSync(path+filename)) {
+        fs.unlinkSync(path+filename)
+    }
+}
+module.exports = { GenerateRandomString, getTokenFromHeader, deleteFile }
