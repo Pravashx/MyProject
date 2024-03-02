@@ -5,7 +5,7 @@ const { getTokenFromHeader } = require('../config/helper')
 
 const CheckLogin = async (req, res, next) => {
     try {
-        
+
         let token = getTokenFromHeader(req);
 
         if (token === null) {
@@ -30,13 +30,12 @@ const CheckLogin = async (req, res, next) => {
                         next({ code: 401, message: "User does not exists" })
                     }
                 } else {
-                    nexxt({ code: 401, message: "Token already expired or invalid" })
+                    next({ code: 401, message: "Token already expired or invalid" })
                 }
             }
         }
-
     } catch (exception) {
-        next({ code: 403, message: "Authentication Failed" })
+        next(exception)
     }
 }
 

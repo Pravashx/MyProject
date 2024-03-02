@@ -35,7 +35,6 @@ class AuthController {
         try {
             let token = req.params.token;
 
-            // query 
             let userDetail = await authSvc.getuserByFilter({
                 token: token
             });

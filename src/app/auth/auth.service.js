@@ -93,7 +93,6 @@ class AuthService {
             let deleted = await PATModel.findOneAndDelete({
                 token: token
             })
-            console.log(deleted)
             if (deleted) {
                 return deleted;
             } else {
