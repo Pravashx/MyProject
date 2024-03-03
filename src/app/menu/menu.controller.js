@@ -103,6 +103,7 @@ class MenuController {
                 { menu: { $in: [detail[0]._id], $nin: null } },
                 { status: "active" }
             ]
+            
 
             if (req.query.search) {
                 prodFilter = {
