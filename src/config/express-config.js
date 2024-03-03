@@ -6,6 +6,7 @@ const cors = require('cors')
 const router = require('../router/index')
 const { MulterError } = require('multer')
 const { ZodError } = require('zod')
+const event = require('./event.config')
 
 app.use(cors());
 
@@ -18,12 +19,13 @@ app.use(express.urlencoded({
 app.use('/health', (req, res, next) => {
     res.send("Success >_<")
 })
+app.use(event)
 app.use('/v1', router)
 
 
 // 404 Error Handling
 app.use((req, res, next) => {
-    next({code: 404, message: "Not Found"})
+    next({ code: 404, message: "Not Found" })
 })
 
 // Handle Different Type Of Error

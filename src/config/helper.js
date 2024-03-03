@@ -1,13 +1,19 @@
 const fs = require('fs')
 const GenerateRandomString = (len = 100) => {
-    const chars = "1234567890abcdefghijklmnopqrstuvwxzABCDEFGHIJKLMNOPQRSTUVWXZ"
-    let length = chars.length
-    random = ""
-    for (let i = 1; i <= len; i++) {
-        let psn = Math.ceil(Math.random() * (length - 1))
-        random += chars[psn]
+    let chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ"
+    let lengths = chars.length;
+    let random = ""
+
+    for (let i = 0; i <= len; i++) {
+        let posn = generateRandomNumber(lengths - 1)
+        random += chars[posn]
     }
     return random
+}
+
+const GenerateRandomNumber = (limit, lower = 0) => {
+    let posn = Math.ceil(lower + (Math.random() * limit))
+    return posn
 }
 
 const getTokenFromHeader = (req) => {
@@ -26,8 +32,8 @@ const getTokenFromHeader = (req) => {
 }
 
 deleteFile = (path, filename) => {
-    if (filename && fs.existsSync(path+filename)) {
-        fs.unlinkSync(path+filename)
+    if (filename && fs.existsSync(path + filename)) {
+        fs.unlinkSync(path + filename)
     }
 }
-module.exports = { GenerateRandomString, getTokenFromHeader, deleteFile }
+module.exports = { GenerateRandomString, getTokenFromHeader, deleteFile, GenerateRandomNumber }

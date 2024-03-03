@@ -5,6 +5,7 @@ const mailSvc = require('../../services/mail.service')
 const jwt = require('jsonwebtoken')
 const { AuthRequest } = require('./auth.request')
 const { getTokenFromHeader, GenerateRandomString } = require('../../config/helper')
+const EventEmitter = require('node:events')
 
 class AuthController {
 
@@ -115,6 +116,9 @@ class AuthController {
                         }
 
                         await authSvc.storePAT(patData)
+                        
+                        const  myEvent = req.myEvent              
+                        myEvent.emit('eventName', {name: "Test"})
 
                         res.json({
                             result: {

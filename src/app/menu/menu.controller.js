@@ -2,6 +2,7 @@ const { deleteFile } = require('../../config/helper')
 const MenuModel = require('./menu.model')
 const MenuRequest = require('./menu.request')
 const menuSvc = require('./menu.service')
+const productSvc = require('../product/product.service')
 
 class MenuController {
     createMenu = async (req, res, next) => {
@@ -96,11 +97,56 @@ class MenuController {
                 slug: req.params.slug,
                 status: "active"
             }
+
             let detail = await menuSvc.getBySlugWithProduct(filter)
+            let prodFilter = [
+                { menu: { $in: [detail[0]._id], $nin: null } },
+                { status: "active" }
+            ]
+
+            if (req.query.search) {
+                prodFilter = {
+                    $and: [
+                        ...prodFilter,
+                        {
+                            $or: [
+                                { title: new RegExp(req.query.search, 'i') },
+                                { description: new RegExp(req.query.search, 'i') }
+                            ]
+                        }
+                    ]
+                }
+            } else {
+                prodFilter = {
+                    $and: [
+                        ...prodFilter
+                    ]
+                }
+            }
+
+            let sort = { _id: "desc", title: "asc" }
+            if (req.query.sort) {
+                let sortsplit = req.query.sort.split(',')
+                sort = { [sortsplit[0]]: sortsplit[1] }
+            }
+
+            const total = await productSvc.countData(filter)
+            const limit = +req.query.limit || 10;
+            const page = +req.query.page || 1;
+            const skip = (page - 1) * limit;
+            const products = await productSvc.getData(prodFilter, { limit, skip })
+
             res.json({
-                result: detail,
+                result: {
+                    detail,
+                    products
+                },
                 message: "Menu Fetched Sucessfully",
-                meta: null
+                meta: {
+                    total: total,
+                    page: page,
+                    limit: limit
+                }
             })
         } catch (exception) {
             next(exception)
@@ -144,6 +190,12 @@ class MenuController {
 
     deleteById = async (req, res, next) => {
         try {
+            let id = req.params.id
+            let data = await menuSvc.getById({ _id: id })
+            if (!data) {
+                throw { code: 404, message: "Menu does not exists" }
+            }
+
             let deleted = await menuSvc.deleteById(req.params.id)
             if (deleted.image) {
                 deleteFile("./public/uploads/menu/", deleted.image)

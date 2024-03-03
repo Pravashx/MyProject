@@ -1,10 +1,8 @@
-const menuSvc = require("../app/menu/menu.service")
-
 const CheckAccess = (svc) => {
     return async (req, res, next) => {
         try {
             let id = req.params.id
-            let data = await menuSvc.getById({
+            let data = await svc.getById({
                 _id: id
             })
             if (!data) {
@@ -12,11 +10,12 @@ const CheckAccess = (svc) => {
             } else if (!data.createdBy._id.equals(req.authUser._id)) {
                 throw { code: 403, message: "Content does not belongs to you" }
             } else {
+                // 
                 req.content = data
-                next()
+                next();
             }
         } catch (exception) {
-
+            next(exception)
         }
     }
 }

@@ -1,31 +1,46 @@
-const MenuModel = require("./menu.model")
+const { GenerateRandomNumber } = require("../../config/helper")
+const ProductModel = require("./product.model")
 
-class MenuService {
+class ProductService {
 
     create = async (payload) => {
         try {
-            const create = MenuModel(payload)
+            const create = ProductModel(payload)
             return await create.save()
         } catch (exception) {
             throw exception
         }
     }
 
+    checkSlug = async(slug) =>{
+        try{
+            let count = await ProductModel.countDocuments({slug: slug})
+            if(count>0){
+                let random = GenerateRandomNumber(1000)
+                slug = slug+'-' + random;
+                return await this.checkSlug(slug)
+            }else{
+                return slug
+            }
+        }catch(exception){
+            throw exception
+        }
+    }
+
     countData = async (filter) => {
         try {
-            const count = await MenuModel.countDocuments(filter)
+            const count = await ProductModel.countDocuments(filter)
             return count;
         } catch (exception) {
             throw exception
         }
     }
 
-    getData = async (filter, { limit = 15, skip = 0 }, sort = { _id: "desc", title: "asc" }) => {
+    getData = async (filter, { limit = 15, skip = 0 }) => {
         try {
-            let data = await MenuModel.find(filter)
-                .populate("parentId", ['_id', 'title', 'slug', 'status'])
-                .populate("createdBy", ['_id', 'name', 'status'])
-                .sort(sort)
+            let data = await ProductModel.find(filter)
+                .populate("menu", ['_id', 'title', 'slug', 'status'])
+                .sort({ _id: "desc" })
                 .skip(skip)
                 .limit(limit)
             return data;
@@ -51,7 +66,7 @@ class MenuService {
                     }
                 }, {
                     '$lookup': {
-                        'from': 'menus',
+                        'from': 'products',
                         'localField': 'parentId',
                         'foreignField': '_id',
                         'as': 'parentId'
@@ -84,9 +99,9 @@ class MenuService {
                     }
                 }
             ]
-            let data = await MenuModel.aggregate(pipeline)
+            let data = await ProductModel.aggregate(pipeline)
             if (!data) {
-                throw { code: 404, message: "Menu does not exists" }
+                throw { code: 404, message: "Product does not exists" }
             }
             return data
         } catch (exception) {
@@ -96,11 +111,10 @@ class MenuService {
 
     getById = async (filter) => {
         try {
-            let data = await MenuModel.findOne(filter)
-                .populate("parentId", ['_id', 'title', 'slug', 'status'])
-                .populate("createdBy", ['_id', 'name'])
+            let data = await ProductModel.findOne(filter)
+                .populate("menu", ['_id', 'title', 'slug', 'status'])
             if (!data) {
-                throw { code: 404, message: "Menu does not exists" }
+                throw { code: 404, message: "Product does not exists" }
             }
             return data
         } catch (exception) {
@@ -108,24 +122,22 @@ class MenuService {
         }
     }
 
-    updateById = async (id, data) => {
+    updateById = async(id, data) =>{
         try {
-            const update = await MenuModel.findByIdAndUpdate(id, {
-                $set: data
-            })
-            return update
-        } catch (exception) {
+            const update = await ProductModel.findByIdAndUpdate(id, {$set: data});
+            return update;
+        } catch(exception) {
             throw exception
         }
     }
 
     deleteById = async (id) => {
         try {
-            let deleted = await MenuModel.findByIdAndDelete(id)
+            let deleted = await ProductModel.findByIdAndDelete(id)
             if (deleted) {
                 return deleted
             } else {
-                throw { code: 404, message: "Menu does not exists" }
+                throw { code: 404, message: "Product does not exists" }
             }
         } catch (exception) {
             throw exception
@@ -133,5 +145,5 @@ class MenuService {
     }
 }
 
-const menuSvc = new MenuService
-module.exports = menuSvc
+const productSvc = new ProductService
+module.exports = productSvc

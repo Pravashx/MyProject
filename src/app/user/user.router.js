@@ -2,55 +2,56 @@ const router = require('express').Router()
 const CheckLogin = require('../../middlewares/auth.middleware')
 const CheckPermission = require('../../middlewares/rbac.middleware')
 const uploader = require('../../middlewares/uploader.middleware')
-const menuCtrl = require('./menu.controller')
+const userCtrl = require('./user.controller')
 const ValidateRequest = require("../../middlewares/validate-request-middleware")
-const { MenuValidator } = require('./menu.validator')
+const { UserValidator } = require('./user.validator')
 const CheckAccess = require('../../middlewares/access-check.middleware')
-const menuSvc = require('./menu.service')
+const userSvc = require('./user.service')
 
 const dirsetup = (req, res, next) => {
-    req.uploadDir = "./public/uploads/menu"
+    req.uploadDir = "./public/uploads/user"
     next()
 }
 
-router.get('/home', menuCtrl.listForHome)
+router.get('/home', userCtrl.listForHome)
 
-router.get("/:slug/slug", menuCtrl.getBySlug)
+router.get("/:slug/slug", userCtrl.getBySlug)
 
 router.route('/')
     .post(
         CheckLogin,
         CheckPermission('admin'),
         dirsetup,
-        uploader.single('image'),
-        ValidateRequest(MenuValidator),
-        menuCtrl.createMenu
+        uploader.array('images'),
+        ValidateRequest(UserValidator),
+        userCtrl.createUser
     )
      .get(
         CheckLogin,
         CheckPermission('admin'),
-        menuCtrl.listAllMenu
+        userCtrl.listAllUser
      )   
 
 router.route('/:id')   
         .get(
             CheckLogin,
             CheckPermission('admin'),
-            menuCtrl.getById
+            userCtrl.getById
         )
         .put(
             CheckLogin,
             CheckPermission('admin'),
-            CheckAccess(menuSvc),
+            CheckAccess(userSvc),
             dirsetup,
             uploader.single('image'),
-            ValidateRequest(MenuValidator),
-            menuCtrl.updateById
+            ValidateRequest(UserValidator),
+            userCtrl.updateById
         )
         .delete(
             CheckLogin,
             CheckPermission('admin'),
-            menuCtrl.deleteById
+            CheckAccess(userSvc),
+            userCtrl.deleteById
         )
 
 module.exports = router
